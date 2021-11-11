@@ -1,10 +1,13 @@
-
 {% if field.formattedValue is iterable %}
-{{ field.formattedValue[0] }} <a href="https://www.github.com/mautic/mautic/releases/tag/{{ field.formattedValue[1] }}"
-                                 target="_blank" data-toggle="tooltip" data-placement="bottom"
-                                 title="A Stable Update for this instance is available">🔺</a>
+    <a class="btn btn-warning action-new"
+            href="https://www.github.com/mautic/mautic/releases/tag/{{ field.formattedValue[1] }}"
+            target="_blank" data-toggle="tooltip" data-placement="bottom"
+            title="A Stable Update ({{ field.formattedValue[1] }}) for this instance is available">
+            {{ field.formattedValue[0] }}
+
+    </a>
 {% else %}
-{{ field.formattedValue }}
+    {{ field.formattedValue }}
 {% endif %}
 
 {% dump(_context) %}

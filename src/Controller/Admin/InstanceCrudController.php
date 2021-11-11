@@ -7,6 +7,7 @@ use App\Service\GithubApiService;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\UrlField;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
@@ -29,6 +30,7 @@ class InstanceCrudController extends AbstractCrudController
     {
         $this->githubApiService->updateAssociativeArrayOfLatestVersions();
         return [
+            IdField::new('id')->hideOnForm()->hideOnDetail()->hideOnIndex(),
             # Configurable Fields
             FormField::addPanel('Basic Configuration'),
             TextField::new('name'),
@@ -36,13 +38,12 @@ class InstanceCrudController extends AbstractCrudController
 
             # Monitored Fields
             FormField::addPanel('Monitored Fields')->hideOnForm(),
-            TextField::new('phpVersion')->hideOnForm(),
             TextField::new('mauticVersion')->hideOnForm()
                 ->formatValue(fn($value) => $this->githubApiService->compareVersionAgainstLatestVersion($value)
                     ? sprintf('%s 🔹', $value)
-                        : [$value,$this->githubApiService->getLatestStableVersionForMajorVersion($value)])
-                    //: sprintf('%s 🔺', $value))
+                    : [$value, $this->githubApiService->getLatestStableVersionForMajorVersion($value)])
                 ->setTemplatePath('admin/field/mautic_version.html.twig'),
+            TextField::new('phpVersion')->hideOnForm(),
             DateTimeField::new('lastUpdated')->hideOnForm()
                 ->setFormat('dd.MM.YY HH:mm'),
 
