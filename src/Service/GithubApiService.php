@@ -2,6 +2,8 @@
 
 namespace App\Service;
 
+use Symfony\Component\HttpClient\CachingHttpClient;
+use Symfony\Component\HttpKernel\HttpCache\Store;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class GithubApiService
@@ -12,11 +14,13 @@ class GithubApiService
         4=>['stable'=>"4.0.0", 'dev' => "4.0.0-b"],
     ];
 
-    private $client;
-
-    public function __construct(HttpClientInterface $httpClient)
+    public function __construct(HttpClientInterface $client)
     {
-        $this->client = $httpClient;
+        $store = new Store('cache/');
+        $this->client = new CachingHttpClient($client, $store, [
+            'default_ttl' => 3600, // 1 hour
+        ]);
+
         $this->updateAssociativeArrayOfLatestVersions();
     }
 

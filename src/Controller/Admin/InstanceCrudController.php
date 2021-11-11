@@ -27,6 +27,7 @@ class InstanceCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
+        $this->githubApiService->updateAssociativeArrayOfLatestVersions();
         return [
             # Configurable Fields
             FormField::addPanel('Basic Configuration'),
