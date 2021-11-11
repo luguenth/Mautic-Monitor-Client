@@ -4,10 +4,16 @@
             target="_blank" data-toggle="tooltip" data-placement="bottom"
             title="A Stable Update ({{ field.formattedValue[1] }}) for this instance is available">
             {{ field.formattedValue[0] }}
+        <i class="fa fa-arrow-up"></i>
 
     </a>
 {% else %}
-    {{ field.formattedValue }}
+    <a class="btn btn-success action-new"
+       href="https://www.github.com/mautic/mautic/releases/tag/{{ field.formattedValue }}"
+       target="_blank">
+        {{ field.formattedValue }}
+
+    </a>
 {% endif %}
 
 {% dump(_context) %}
