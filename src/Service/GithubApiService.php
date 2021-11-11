@@ -102,14 +102,17 @@ class GithubApiService
         }
     }
 
+
     public function getLatestStableVersionForMajorVersion($majorVersion)
     {
-        return $this->latest_versions[$majorVersion]['stable'];
+        $versionNumber = $this->getMajorVersionNumber($majorVersion);
+        return $this->latest_versions[$versionNumber]['stable'];
     }
 
     public function getLatestDevVersionForMajorVersion($majorVersion)
     {
-        return $this->latest_versions[$majorVersion]['dev'];
+        $versionNumber = $this->getMajorVersionNumber($majorVersion);
+        return $this->latest_versions[$versionNumber]['dev'];
     }
 
     public function compareVersionAgainstLatestVersion($version)
