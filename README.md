@@ -2,6 +2,8 @@
 A monitoring tool for Mautic instances.
 You need to install the [MauticMonitorApiBundle](https://github.com/luguenth/Mautic-Monitor-API-Plugin) in order to use the Mautic-Monitor-Client.
 
+![img.png](img.png)
+
 ## Installation:
 configure the [.env](https://github.com/luguenth/Mautic-Monitor-Client/blob/master/.env) file in the root directory of the project.
 ```
