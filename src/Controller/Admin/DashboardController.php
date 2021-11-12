@@ -19,8 +19,14 @@ class DashboardController extends AbstractDashboardController
      */
     public function index(): Response
     {
-        //return parent::index();
         return $this->render('admin/instanceDetail.html.twig');
+    }
+
+    public function configureCrud(): Crud
+    {
+        return Crud::new()
+            ->setEntityLabelInPlural('Instances')
+            ->showEntityActionsInlined();
     }
 
     public function configureDashboard(): Dashboard
@@ -28,7 +34,8 @@ class DashboardController extends AbstractDashboardController
         return Dashboard::new()
             ->setTitle('Mautic Monitor Client')
             ->renderContentMaximized()
-            ->renderSidebarMinimized();
+            ->renderSidebarMinimized()
+            ;
     }
 
     public function configureMenuItems(): iterable
@@ -40,9 +47,27 @@ class DashboardController extends AbstractDashboardController
     {
         dump($this);
         return parent::configureActions()
+
+            #Index Actions
+            ->update(Crud::PAGE_INDEX, Action::EDIT, function (Action $action) {
+                return $action->setIcon('fa fa-edit')->setLabel(false);
+            })
+            ->update(Crud::PAGE_INDEX, Action::DELETE, function (Action $action) {
+                return $action->setIcon('fa fa-trash')->setLabel(false);
+            })
             ->add(Crud::PAGE_INDEX, Action::DETAIL)
-            ->add(Crud::PAGE_INDEX,
-                Action::new('refresh', 'fas fa-sync-alt')
-            ->linkToCrudAction('refreshInstance'));
+            ->update(Crud::PAGE_INDEX, Action::DETAIL, function (Action $action) {
+                return $action->setIcon('fa fa-eye')->setLabel(false);
+            })
+            ->add(Crud::PAGE_INDEX, Action::new('refresh')
+                ->setIcon('fas fa-sync')
+                ->setLabel(false)
+                ->linkToCrudAction('refreshInstance'))
+
+            #Batch actions
+            ->addBatchAction(Action::new('refreshAll')
+                ->setLabel('Refresh')
+                ->linkToCrudAction('refreshAllInstances'));
+
     }
 }

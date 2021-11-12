@@ -7,6 +7,7 @@ use App\Service\GithubApiService;
 use App\Service\MauticApiService;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Dto\BatchActionDto;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
@@ -64,6 +65,15 @@ class InstanceCrudController extends AbstractCrudController
     {
         $this->mauticApiService->syncInstance($context->getEntity()->getInstance());
         return $this->redirect($context->getReferrer());
+    }
+
+    public function refreshAllInstances(BatchActionDto $actionDto): RedirectResponse
+    {
+        $entityManager = $this->getDoctrine()->getManagerForClass($actionDto->getEntityFqcn());
+        foreach ($actionDto->getEntityIds() as $id) {
+            $instance = $this->getDoctrine()->getRepository(Instance::class)->find($id);
+            $this->mauticApiService->syncInstance($instance);}
+        return $this->redirect($actionDto->getReferrerUrl());
     }
 
 }
