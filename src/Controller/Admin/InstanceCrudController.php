@@ -4,20 +4,25 @@ namespace App\Controller\Admin;
 
 use App\Entity\Instance;
 use App\Service\GithubApiService;
+use App\Service\MauticApiService;
+use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\UrlField;
-use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class InstanceCrudController extends AbstractCrudController
 {
 
-    public function __construct(GithubApiService $githubApiService)
+    public function __construct(
+        GithubApiService $githubApiService,
+        MauticApiService $mauticApiService)
     {
         $this->githubApiService = $githubApiService;
+        $this->mauticApiService = $mauticApiService;
     }
 
     public static function getEntityFqcn(): string
@@ -53,6 +58,12 @@ class InstanceCrudController extends AbstractCrudController
             TextField::new('password')->hideOnIndex()
                 ->formatValue(fn($value) => '********'),
         ];
+    }
+
+    public function refreshInstance(AdminContext $context): RedirectResponse
+    {
+        $this->mauticApiService->syncInstance($context->getEntity()->getInstance());
+        return $this->redirect($context->getReferrer());
     }
 
 }
