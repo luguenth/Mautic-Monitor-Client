@@ -26,7 +26,10 @@ class DashboardController extends AbstractDashboardController
     {
         return Crud::new()
             ->setEntityLabelInPlural('Instances')
-            ->showEntityActionsInlined();
+            ->showEntityActionsInlined()
+            ->overrideTemplates([
+                'crud/index' => 'admin/crud/index.html.twig'
+            ]);
     }
 
     public function configureDashboard(): Dashboard
@@ -45,7 +48,6 @@ class DashboardController extends AbstractDashboardController
 
     public function configureActions(): Actions
     {
-        dump($this);
         return parent::configureActions()
 
             #Index Actions

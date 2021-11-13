@@ -9,9 +9,9 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 class GithubApiService
 {
     private $latest_versions = [
-        2=>['stable'=>"2.0.0", 'dev' => "2.0.0-b"],
-        3=>['stable'=>"3.0.0", 'dev' => "3.0.0-b"],
-        4=>['stable'=>"4.0.0", 'dev' => "4.0.0-b"],
+        2 => ['stable' => "2.0.0", 'dev' => "2.0.0-b"],
+        3 => ['stable' => "3.0.0", 'dev' => "3.0.0-b"],
+        4 => ['stable' => "4.0.0", 'dev' => "4.0.0-b"],
     ];
 
     public function __construct(HttpClientInterface $client)
@@ -22,8 +22,15 @@ class GithubApiService
         ]);
 
         $this->updateAssociativeArrayOfLatestVersions();
+
     }
 
+    /**
+     * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface
+     */
     private function getReleasesFromGithub()
     {
         $response = $this->client->request('GET', 'https://api.github.com/repos/mautic/mautic/releases');
@@ -53,9 +60,9 @@ class GithubApiService
     }
 
     # Function to get Major Version Number
-    public function getMajorVersionNumber($version):int
+    public function getMajorVersionNumber($version): int
     {
-        if(!$version) {
+        if (!$version) {
             throw new \Exception("Version is not valid");
         }
         $version_number = explode(".", $version);
@@ -89,17 +96,24 @@ class GithubApiService
     }
 
     # Function to build associative array of latest stable versions
+
+    /**
+     * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface
+     */
     public function updateAssociativeArrayOfLatestVersions()
     {
         $releases = $this->getReleasesFromGithub();
         foreach ($releases as $release) {
             $version_number = $release['tag_name'];
             if ($this->isVersionStable($version_number)) {
-                if($this->compareVersions($version_number, $this->latest_versions[$this->getMajorVersionNumber($version_number)]['stable'])) {
+                if ($this->compareVersions($version_number, $this->latest_versions[$this->getMajorVersionNumber($version_number)]['stable'])) {
                     $this->latest_versions[$this->getMajorVersionNumber($version_number)]["stable"] = $version_number;
                 }
             } else {
-                if($this->compareVersions($version_number, $this->latest_versions[$this->getMajorVersionNumber($version_number)]['dev'])) {
+                if ($this->compareVersions($version_number, $this->latest_versions[$this->getMajorVersionNumber($version_number)]['dev'])) {
                     $this->latest_versions[$this->getMajorVersionNumber($version_number)]["dev"] = $version_number;
                 }
             }
@@ -121,7 +135,7 @@ class GithubApiService
 
     public function compareVersionAgainstLatestVersion($version)
     {
-        if(!$version) {
+        if (!$version) {
             return false;
         }
         $majorVersion = $this->getMajorVersionNumber($version);

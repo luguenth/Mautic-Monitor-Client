@@ -53,6 +53,12 @@ class MauticApiService
         return ($this->username && $this->password);
     }
 
+    /**
+     * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface
+     */
     private function request(string $endpoint)
     {
         if (!$this->hasCredentials()) {
@@ -86,10 +92,15 @@ class MauticApiService
     public function syncInstance(Instance $instance)
     {
         $this->setCredentials($instance);
-        $instanceInfo = $this->request("/monitor/all");
-        $instance->setPhpVersion($instanceInfo['phpVersion']);
-        $instance->setMauticVersion($instanceInfo['mauticVersion']);
-        $instance->setLastUpdated();
+        try {
+            $instanceInfo = $this->request("/monitor/all");
+            $instance->setState("up");
+            $instance->setPhpVersion($instanceInfo['phpVersion']);
+            $instance->setMauticVersion($instanceInfo['mauticVersion']);
+            $instance->setLastUpdated();
+        } catch (\Exception $e) {
+            $instance->setState("down");
+        }
         $this->entityManager->persist($instance);
         $this->entityManager->flush();
     }

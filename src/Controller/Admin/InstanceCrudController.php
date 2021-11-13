@@ -34,7 +34,8 @@ class InstanceCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        $this->githubApiService->updateAssociativeArrayOfLatestVersions();
+        $this->githubApiService->updateAssociativeArrayOfLatestVersions(); // TODO: This must be removed
+
         return [
             IdField::new('id')->hideOnForm()->hideOnDetail()->hideOnIndex(),
             # Configurable Fields
@@ -63,7 +64,7 @@ class InstanceCrudController extends AbstractCrudController
 
     public function refreshInstance(AdminContext $context): RedirectResponse
     {
-        $this->mauticApiService->syncInstance($context->getEntity()->getInstance());
+        $this->syncInstanceWithMessage($context->getEntity()->getInstance());
         return $this->redirect($context->getReferrer());
     }
 
@@ -72,8 +73,21 @@ class InstanceCrudController extends AbstractCrudController
         $entityManager = $this->getDoctrine()->getManagerForClass($actionDto->getEntityFqcn());
         foreach ($actionDto->getEntityIds() as $id) {
             $instance = $this->getDoctrine()->getRepository(Instance::class)->find($id);
-            $this->mauticApiService->syncInstance($instance);}
+            $this->syncInstanceWithMessage($instance);
+        }
         return $this->redirect($actionDto->getReferrerUrl());
+    }
+
+    /**
+     * @param Instance $instance
+     */
+    private function syncInstanceWithMessage($instance)
+    {
+        $this->mauticApiService->syncInstance($instance);
+
+        if ($instance->getState() === "down"){
+            $this->addFlash("warning", $instance->getName() . " is not reachable");
+        }
     }
 
 }
