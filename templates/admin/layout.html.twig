@@ -41,8 +41,6 @@
 </head>
 <script>
     async function getGithubReleases(passedVersion) {
-        //await new Promise(r => setTimeout(r, 2000));
-        console.log('getGithubReleases');
         let response = await fetch('https://api.github.com/repos/mautic/mautic/releases')
         // get Response body
         let body = await response.json();

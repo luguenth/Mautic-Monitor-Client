@@ -47,9 +47,6 @@ class InstanceCrudController extends AbstractCrudController
             # Monitored Fields
             FormField::addPanel('Monitored Fields')->hideOnForm(),
             TextField::new('mauticVersion')->hideOnForm()
-                ->formatValue(fn($value) => $this->githubApiService->compareVersionAgainstLatestVersion($value)
-                    ? $value
-                    : [$value, $this->githubApiService->getLatestStableVersionForMajorVersion($value)])
                 ->setTemplatePath('admin/field/mautic_version.html.twig'),
             TextField::new('phpVersion')->hideOnForm(),
             DateTimeField::new('lastUpdated')->hideOnForm()
@@ -89,23 +86,6 @@ class InstanceCrudController extends AbstractCrudController
         if ($instance->getState() === "down"){
             $this->addFlash("warning", $instance->getName() . " is not reachable");
         }
-    }
-
-    /**
-     * @param Request $request
-     * @param GithubApiService $githubApi
-     * @return Response
-     * @throws \Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface
-     * @throws \Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface
-     * @throws \Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface
-     * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
-     *
-     * @Route ("/updateVersionsAsync", name="updateVersionsAsync")
-     */
-    public function updateGithubVersions(Request $request, GithubApiService $githubApi): Response
-    {
-        $githubApi->updateAssociativeArrayOfLatestVersions();
-        return $this->json(true);
     }
 
 }

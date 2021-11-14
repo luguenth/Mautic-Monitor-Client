@@ -1,34 +1,12 @@
-{% if field.formattedValue is iterable %}
-    <a class="btn btn-warning action-new"
-       href="https://www.github.com/mautic/mautic/releases/tag/{{ field.formattedValue[1] }}"
-       target="_blank" data-toggle="tooltip" data-placement="bottom"
-       title="A Stable Update ({{ field.formattedValue[1] }}) for this instance is available"
-       xmlns:x-bind="http://www.w3.org/1999/xhtml">
-        {{ field.formattedValue[0] }}
-        <i class="fa fa-arrow-up"></i>
-
-
-        <script>
-            //Todo: Move this into a Twig script block
-            var xhttp = new XMLHttpRequest();
-            xhttp.open("GET", "/updateVersionsAsync", true);
-            xhttp.send();
-
-
-        </script>
-    </a>
-
-{% else %}
-
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.store('githubReleases', {
                 isDeprecated: false,
                 link: false,
-                version: '{{ field.formattedValue }}',
+                version: '{{ field.value }}',
             })
         });
-
+        getGithubReleases('{{ field.value }}');
     </script>
     <div x-data>
         <a :class="$store.githubReleases.isDeprecated ?
@@ -50,9 +28,3 @@
             }"></i>
         </a>
     </div>
-<script>
-    getGithubReleases('{{ field.formattedValue }}');
-</script>
-
-{% endif %}
-
