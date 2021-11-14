@@ -1,20 +1,58 @@
 {% if field.formattedValue is iterable %}
     <a class="btn btn-warning action-new"
-            href="https://www.github.com/mautic/mautic/releases/tag/{{ field.formattedValue[1] }}"
-            target="_blank" data-toggle="tooltip" data-placement="bottom"
-            title="A Stable Update ({{ field.formattedValue[1] }}) for this instance is available">
-            {{ field.formattedValue[0] }}
+       href="https://www.github.com/mautic/mautic/releases/tag/{{ field.formattedValue[1] }}"
+       target="_blank" data-toggle="tooltip" data-placement="bottom"
+       title="A Stable Update ({{ field.formattedValue[1] }}) for this instance is available"
+       xmlns:x-bind="http://www.w3.org/1999/xhtml">
+        {{ field.formattedValue[0] }}
         <i class="fa fa-arrow-up"></i>
 
+
+        <script>
+            //Todo: Move this into a Twig script block
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("GET", "/updateVersionsAsync", true);
+            xhttp.send();
+
+
+        </script>
     </a>
+
 {% else %}
-    <a class="btn btn-success action-new"
-       href="https://www.github.com/mautic/mautic/releases/tag/{{ field.formattedValue }}"
-       target="_blank">
-        {{ field.formattedValue }}
 
-    </a>
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.store('githubReleases', {
+                isDeprecated: false,
+                link: false,
+                version: '{{ field.formattedValue }}',
+            })
+        });
+
+    </script>
+    <div x-data>
+        <a :class="$store.githubReleases.isDeprecated ?
+                                        'btn btn-warning' :
+                                        'btn btn-light'"
+           x-bind:href="$store.githubReleases.link"
+           href="https://www.github.com/mautic/mautic/releases/tag/{{ field.formattedValue }}"
+           target="_blank">
+            {{ field.formattedValue }}
+            <i :class="
+            if($store.githubReleases.link) {
+                if ($store.githubReleases.isDeprecated) {
+                    return 'fa fa-arrow-down'
+                } else {
+                    return 'fa fa-arrow-up'
+                }
+            } else {
+                return 'fa fa-circle-notch fa-spin'
+            }"></i>
+        </a>
+    </div>
+<script>
+    getGithubReleases('{{ field.formattedValue }}');
+</script>
+
 {% endif %}
-
-{% dump(_context) %}
 

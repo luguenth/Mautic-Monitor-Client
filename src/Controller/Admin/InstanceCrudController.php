@@ -14,6 +14,9 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\UrlField;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 
 class InstanceCrudController extends AbstractCrudController
 {
@@ -34,8 +37,6 @@ class InstanceCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        $this->githubApiService->updateAssociativeArrayOfLatestVersions(); // TODO: This must be removed
-
         return [
             IdField::new('id')->hideOnForm()->hideOnDetail()->hideOnIndex(),
             # Configurable Fields
@@ -47,7 +48,7 @@ class InstanceCrudController extends AbstractCrudController
             FormField::addPanel('Monitored Fields')->hideOnForm(),
             TextField::new('mauticVersion')->hideOnForm()
                 ->formatValue(fn($value) => $this->githubApiService->compareVersionAgainstLatestVersion($value)
-                    ? sprintf('%s 🔹', $value)
+                    ? $value
                     : [$value, $this->githubApiService->getLatestStableVersionForMajorVersion($value)])
                 ->setTemplatePath('admin/field/mautic_version.html.twig'),
             TextField::new('phpVersion')->hideOnForm(),
@@ -88,6 +89,23 @@ class InstanceCrudController extends AbstractCrudController
         if ($instance->getState() === "down"){
             $this->addFlash("warning", $instance->getName() . " is not reachable");
         }
+    }
+
+    /**
+     * @param Request $request
+     * @param GithubApiService $githubApi
+     * @return Response
+     * @throws \Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
+     *
+     * @Route ("/updateVersionsAsync", name="updateVersionsAsync")
+     */
+    public function updateGithubVersions(Request $request, GithubApiService $githubApi): Response
+    {
+        $githubApi->updateAssociativeArrayOfLatestVersions();
+        return $this->json(true);
     }
 
 }

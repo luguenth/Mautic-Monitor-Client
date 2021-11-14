@@ -28,7 +28,8 @@ class DashboardController extends AbstractDashboardController
             ->setEntityLabelInPlural('Instances')
             ->showEntityActionsInlined()
             ->overrideTemplates([
-                'crud/index' => 'admin/crud/index.html.twig'
+                'crud/index' => 'admin/crud/index.html.twig',
+                'layout' => 'admin/layout.html.twig',
             ]);
     }
 

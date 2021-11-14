@@ -11,7 +11,7 @@ class GithubApiService
     private $latest_versions = [
         2 => ['stable' => "2.0.0", 'dev' => "2.0.0-b"],
         3 => ['stable' => "3.0.0", 'dev' => "3.0.0-b"],
-        4 => ['stable' => "4.0.0", 'dev' => "4.0.0-b"],
+        4 => ['stable' => "3.0.0", 'dev' => "4.0.0-b"],
     ];
 
     public function __construct(HttpClientInterface $client)
@@ -20,9 +20,6 @@ class GithubApiService
         $this->client = new CachingHttpClient($client, $store, [
             'default_ttl' => 3600, // 1 hour
         ]);
-
-        $this->updateAssociativeArrayOfLatestVersions();
-
     }
 
     /**
