@@ -39,8 +39,6 @@ class InstancesSyncCommand extends Command
         $this->mauticApi->syncInstances($io);
         $io->success('Instances synced');
 
-        dump($this->githubApi->getLatestStableVersion());
-
         return Command::SUCCESS;
     }
 }

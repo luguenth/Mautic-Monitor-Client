@@ -110,8 +110,7 @@
                     {% set some_results_are_hidden = true %}
                 {% else %}
                     <tr data-id="{{ entity.primaryKeyValueAsString }}"
-                        {% dump(entity) %}
-                    class="{% if entity.Instance.State == "down" %} table-danger {% endif %}">
+                    class="{% if entity.Instance.State == "down" %} table-danger{% endif %}">
                         {% if has_batch_actions %}
                             <td class="batch-actions-selector">
                                 <div class="form-check">
