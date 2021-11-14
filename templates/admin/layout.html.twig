@@ -59,21 +59,20 @@
 
         // check if there is a newer version and if not, return the passed in version
         if (newestStableRelease.length > 0) {
-            console.log("true");
+            newestStableRelease = newestStableRelease[0];
             Alpine.store('githubReleases', {
+                link: newestStableRelease.html_url,
+                version: newestStableRelease.tag_name,
                 isDeprecated: true,
             })
-            newestStableRelease = newestStableRelease[0];
         } else {
+            newestStableRelease = currentVersion;
             Alpine.store('githubReleases', {
+                link: newestStableRelease.html_url,
+                version: newestStableRelease.tag_name,
                 isDeprecated: false,
             })
-            newestStableRelease = currentVersion;
         }
-        Alpine.store('githubReleases', {
-            link: newestStableRelease.html_url,
-            version: newestStableRelease.tag_name,
-        })
     }
 </script>
 {% block body %}

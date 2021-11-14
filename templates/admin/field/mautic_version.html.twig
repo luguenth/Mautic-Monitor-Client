@@ -41,9 +41,9 @@
             <i :class="
             if($store.githubReleases.link) {
                 if ($store.githubReleases.isDeprecated) {
-                    return 'fa fa-arrow-down'
-                } else {
                     return 'fa fa-arrow-up'
+                } else {
+                    return 'fa fa-check'
                 }
             } else {
                 return 'fa fa-circle-notch fa-spin'
