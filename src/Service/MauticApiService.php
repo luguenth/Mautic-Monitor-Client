@@ -20,6 +20,16 @@ class MauticApiService
      */
     private $password;
 
+    /**
+     * @var string
+     */
+    private $baseUrl;
+
+    /**
+     * @param HttpClientInterface $client
+     * @param InstanceRepository $instanceRepository
+     * @param EntityManagerInterface $entityManager
+     */
     public function __construct(
         HttpClientInterface    $client,
         InstanceRepository     $instanceRepository,
@@ -32,6 +42,7 @@ class MauticApiService
 
     public function getMonitoringData(Instance $instance)
     {
+        dump($instance);
         $this->setCredentials($instance);
         $this->request("/monitor");
     }
@@ -46,6 +57,7 @@ class MauticApiService
     {
         $this->username = $instance->getUsername();
         $this->password = $instance->getPassword();
+        $this->baseUrl = $instance->getBaseUrl();
     }
 
     private function hasCredentials(): bool
@@ -64,11 +76,15 @@ class MauticApiService
         if (!$this->hasCredentials()) {
             return "no Credentials";
         }
-        $base_url = "https://mautic2.ddev.site/api";
+
+        dump($this->baseUrl . $endpoint);
+
         $response = $this->client->request(
             "GET",
-            $base_url . $endpoint,
+            $this->baseUrl . "/api" . $endpoint,
             ['auth_basic' => [$this->username, $this->password]]);
+        dump($response->getContent());
+        error_log($response->getContent());
         return json_decode($response->getContent(), true);
     }
 
@@ -93,6 +109,7 @@ class MauticApiService
     {
         $this->setCredentials($instance);
         try {
+            error_log("Syncing instance " . $instance->getName(),4);
             $instanceInfo = $this->request("/monitor/all");
             $instance->setState("up");
             $instance->setPhpVersion($instanceInfo['phpVersion']);
